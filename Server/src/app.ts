@@ -7,7 +7,6 @@ const supabase = createClient(
   process.env.API_URL as string,
   process.env.API_KEY as string
 );
-//console.log(supabase);
 
 const PORT = process.env.PORT;
 const app = express();
