@@ -15,8 +15,10 @@ yarn install
 ```
 npm i -g @nestjs/cli
 ```
+3. Clonar el archivo ```.env.template``` y renombrarlo a ```.env.development```
+4. Llenar las variables de entorno
 
-7. Ejecutar la aplicacion en dev: 
+5. Ejecutar la aplicacion en dev: 
 ```
 yarn start:dev
 ```
