@@ -12,6 +12,9 @@ async function bootstrap() {
   /* ======= LOAD CONFIG .ENV.* ======= */
   const config: ConfigService = app.get(ConfigService);
 
+  /* ======= SET PREFIX END_POINT ======= */
+  app.setGlobalPrefix('api/v1');
+
   await app.listen(config.get('api.port') ?? 3005, '0.0.0.0');
   logger.log(`🚀 Application is running on: ${await app.getUrl()}`);
 }
