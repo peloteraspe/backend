@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { initSwagger } from './app.swagger';
 
 async function bootstrap() {
   const logger = new Logger();
@@ -18,7 +19,20 @@ async function bootstrap() {
   /* ======= ENABLE CORS ======= */
   app.enableCors();
 
+  /* ======= INIT DOC SWAGGER ======= */
+  if (process.env.NODE_ENV !== 'production') {
+    initSwagger(app);
+  }
+
   await app.listen(config.get('api.port') ?? 3005, '0.0.0.0');
   logger.log(`🚀 Application is running on: ${await app.getUrl()}`);
+
+  /* ======= DOCS GENERATE ======= */
+  if (process.env.NODE_ENV !== 'production') {
+    logger.debug(
+      `Swagger document generated ${await app.getUrl()}/api/v1/docs`,
+      'Swagger',
+    );
+  }
 }
 void bootstrap();
