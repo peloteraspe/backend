@@ -15,6 +15,9 @@ async function bootstrap() {
   /* ======= SET PREFIX END_POINT ======= */
   app.setGlobalPrefix('api/v1');
 
+  /* ======= ENABLE CORS ======= */
+  app.enableCors();
+
   await app.listen(config.get('api.port') ?? 3005, '0.0.0.0');
   logger.log(`🚀 Application is running on: ${await app.getUrl()}`);
 }
