@@ -1,0 +1,24 @@
+{
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "tmp", "dist"],
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "target": "ES2021",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "incremental": true,
+    "declaration": false,
+    "skipLibCheck": true,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "skipDefaultLibCheck": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": false,
+  }
+}
