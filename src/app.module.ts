@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SupabaseModule } from 'nestjs-supabase-js';
 
 import { EnvConfiguration, JoiValidationSchema } from './config';
+import { EventModule } from './modules/event/event.module';
+import { ProfileModule } from './modules/profile/profile.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { EnvConfiguration, JoiValidationSchema } from './config';
         supabaseKey: configService.get('supabase.key') ?? '',
       }),
     }),
+    EventModule,
+    ProfileModule,
   ],
 })
 export class AppModule {}
