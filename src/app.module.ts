@@ -4,6 +4,7 @@ import { SupabaseModule } from 'nestjs-supabase-js';
 
 import { EnvConfiguration, JoiValidationSchema } from './config';
 import { EventModule } from './modules/event/event.module';
+import { ProfileModule } from './modules/profile/profile.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { EventModule } from './modules/event/event.module';
       }),
     }),
     EventModule,
+    ProfileModule,
   ],
 })
 export class AppModule {}
