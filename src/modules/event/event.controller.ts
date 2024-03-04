@@ -28,4 +28,18 @@ export class EventController {
   getUsernameByEventId(@Param('eventId', ParseIntPipe) eventId: number) {
     return this.eventService.getUsernameByEventId(eventId);
   }
+
+  @Get()
+  @ApiOperation({ description: 'Obtiene todos los eventos' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de todos los eventos',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No se encontraron eventos',
+  })
+  getAllEvents() {
+    return this.eventService.getAllEvents();
+  }
 }
