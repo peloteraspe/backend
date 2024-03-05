@@ -2,16 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
-export class LevelService {
+export class EventTypeService {
   constructor(private readonly supabaseClient: SupabaseClient) {}
-  async getLevelNameById(levelId: string) {
+  async getNameByEventTypeId(eventTypeId: string) {
     const { data } = await this.supabaseClient
-      .from('level')
+      .from('eventType')
       .select('name')
-      .eq('id', levelId)
+      .eq('id', eventTypeId)
       .single();
 
-    if (!data) throw new NotFoundException('No se encontró el nivel');
+    if (!data) throw new NotFoundException('No se encontró el tipo de evento');
 
     return data?.name;
   }
