@@ -3,8 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SupabaseModule } from 'nestjs-supabase-js';
 
 import { EnvConfiguration, JoiValidationSchema } from './config';
+import { AssistantsModule } from './modules/assistants/assistants.module';
 import { EventModule } from './modules/event/event.module';
+import { EventFeaturesModule } from './modules/eventFeatures/eventFeatures.module';
 import { EventTypeModule } from './modules/eventType/eventType.module';
+import { FeaturesModule } from './modules/features/features.module';
 import { LevelModule } from './modules/level/level.module';
 import { ProfileModule } from './modules/profile/profile.module';
 
@@ -28,6 +31,9 @@ import { ProfileModule } from './modules/profile/profile.module';
     ProfileModule,
     LevelModule,
     EventTypeModule,
+    EventFeaturesModule,
+    FeaturesModule,
+    AssistantsModule,
   ],
 })
 export class AppModule {}

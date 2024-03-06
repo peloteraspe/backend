@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SupabaseModule } from 'nestjs-supabase-js';
 
+import { AssistantsModule } from '../assistants/assistants.module';
 import { EventFeaturesModule } from '../eventFeatures/eventFeatures.module';
 import { EventTypeModule } from '../eventType/eventType.module';
 import { LevelModule } from '../level/level.module';
@@ -17,6 +18,7 @@ import { EventService } from './event.service';
     LevelModule,
     EventTypeModule,
     EventFeaturesModule,
+    AssistantsModule,
   ],
 })
 export class EventModule {}

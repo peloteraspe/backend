@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
+import { AssistantsService } from '../assistants/assistants.service';
 import { EventFeaturesService } from '../eventFeatures/eventFeatures.service';
 import { EventTypeService } from '../eventType/eventType.service';
 import { LevelService } from '../level/level.service';
@@ -14,6 +15,7 @@ export class EventService {
     private readonly levelService: LevelService,
     private readonly eventTypeService: EventTypeService,
     private readonly eventFeatureService: EventFeaturesService,
+    private readonly assistantsService: AssistantsService,
   ) {}
   async getUsernameByEventId(eventId: number) {
     const { data, status } = await this.supabaseClient
@@ -30,29 +32,39 @@ export class EventService {
   }
 
   async getAllEvents() {
-    const { data, status } = await this.supabaseClient
+    const { data: relationData, status: relationDataStatus } =
+      await this.supabaseClient.from('event').select('id, level, EventType');
+    const { data: eventData } = await this.supabaseClient
       .from('event')
-      .select(
-        'id, level, EventType, start_time, end_time, location_text, price',
-      );
+      .select('title, start_time, end_time, location, location_text, price');
 
-    if (status !== 200 || !data)
+    if (relationDataStatus !== 200 || !relationData || !eventData)
       throw new NotFoundException('No se encontraron eventos');
 
     const eventsWithData = await Promise.all(
-      data.map(async (event) => {
+      relationData.map(async (event, index) => {
         const levelId = event.level;
         const Nivel = await this.levelService.getLevelNameById(levelId);
 
         const eventTypeid = event.EventType;
-        const Tipo =
+        const TipoDeEvento =
           await this.eventTypeService.getNameByEventTypeId(eventTypeid);
 
         const eventFeatureid = event.id;
-        const Servicio =
-          await this.eventFeatureService.getFeatureById(eventFeatureid);
+        const Servicios =
+          await this.eventFeatureService.getEventFeatureById(eventFeatureid);
 
-        return { ...event, Nivel, Tipo, Servicio };
+        const assistantsid = event.id;
+        const Participantes =
+          await this.assistantsService.getAssistantsById(assistantsid);
+
+        return {
+          ...eventData[index],
+          Nivel,
+          TipoDeEvento,
+          Servicios,
+          Participantes,
+        };
       }),
     );
 
