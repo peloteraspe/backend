@@ -12,6 +12,7 @@ export class EventFeaturesService {
 
     if (!data)
       throw new NotFoundException('No se encontró el servicio de evento');
+    console.log(data);
 
     return data;
   }

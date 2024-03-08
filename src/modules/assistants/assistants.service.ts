@@ -12,7 +12,6 @@ export class AssistantsService {
 
     if (!data)
       throw new NotFoundException('No se encontró el servicio de evento');
-
-    return data;
+    return data[0].user;
   }
 }

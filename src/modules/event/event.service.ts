@@ -28,6 +28,7 @@ export class EventService {
     const userId = data?.created_by_id;
 
     const username = await this.profileService.getUsernameByUserId(userId);
+
     return username;
   }
 
@@ -55,8 +56,10 @@ export class EventService {
           await this.eventFeatureService.getEventFeatureById(eventFeatureid);
 
         const assistantsid = event.id;
-        const Participantes =
+        const Assistants =
           await this.assistantsService.getAssistantsById(assistantsid);
+        const Participantes =
+          await this.profileService.getUsernameByUserId(Assistants);
 
         return {
           ...eventData[index],

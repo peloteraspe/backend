@@ -13,6 +13,6 @@ export class ProfileService {
 
     if (!data) throw new NotFoundException('No se encontró el user');
 
-    return data?.username;
+    return data;
   }
 }
