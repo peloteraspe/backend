@@ -55,12 +55,10 @@ export class EventService {
           ...rest
         } = event;
 
-        const formattedDateTime: string =
-          this.formatDate(startTime) +
-          ' | ' +
-          this.formatTime(startTime) +
-          ' - ' +
-          this.formatTime(endTime);
+        const formattedDateTime: string = this.formattedDateTime(
+          startTime,
+          endTime,
+        );
 
         const level = await this.levelService.getLevelNameById(levelId);
 
@@ -88,6 +86,17 @@ export class EventService {
     );
 
     return eventsData;
+  }
+
+  private formattedDateTime(startTime: string, endTime: string): string {
+    const data =
+      this.formatDate(startTime) +
+      ' | ' +
+      this.formatTime(startTime) +
+      ' - ' +
+      this.formatTime(endTime);
+
+    return data;
   }
 
   private formatDate(dateString: string): string {
