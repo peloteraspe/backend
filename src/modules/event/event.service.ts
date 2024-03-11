@@ -36,7 +36,7 @@ export class EventService {
     const { data, status } = await this.supabaseClient
       .from('event')
       .select(
-        'id, level, EventType,title, start_time, end_time, location, location_text, price',
+        'id, level, EventType,title, start_time, end_time, location, location_text, price, max_users',
       );
 
     if (status !== 200 || !data)
@@ -51,6 +51,7 @@ export class EventService {
           location_text: locationText,
           level: levelId,
           EventType: eventTypeid,
+          max_users,
           ...rest
         } = event;
 
@@ -71,8 +72,8 @@ export class EventService {
 
         const assistantsIds =
           await this.assistantsService.getAssistantsByEventId(eventId);
-        const assistants =
-          await this.profileService.getUsernameByUserId(assistantsIds);
+
+        const placesLeft = max_users - assistantsIds.length;
 
         return {
           level,
@@ -80,7 +81,7 @@ export class EventService {
           formattedDateTime,
           locationText,
           services,
-          assistants,
+          placesLeft,
           ...rest,
         };
       }),
