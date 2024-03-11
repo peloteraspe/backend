@@ -4,11 +4,11 @@ import { SupabaseClient } from '@supabase/supabase-js';
 @Injectable()
 export class AssistantsService {
   constructor(private readonly supabaseClient: SupabaseClient) {}
-  async getAssistantsById(AssistantsId: string) {
+  async getAssistantsByEventId(eventId: string) {
     const { data } = await this.supabaseClient
       .from('assistants')
       .select('user')
-      .eq('event', AssistantsId);
+      .eq('event', eventId);
 
     if (!data)
       throw new NotFoundException('No se encontró el servicio de evento');

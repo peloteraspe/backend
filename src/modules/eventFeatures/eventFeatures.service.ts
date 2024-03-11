@@ -4,11 +4,11 @@ import { SupabaseClient } from '@supabase/supabase-js';
 @Injectable()
 export class EventFeaturesService {
   constructor(private readonly supabaseClient: SupabaseClient) {}
-  async getEventFeatureById(eventFeatureId: string) {
+  async getEventFeatureByEventId(eventId: string) {
     const { data } = await this.supabaseClient
       .from('eventFeatures')
       .select('feature')
-      .eq('event', eventFeatureId);
+      .eq('event', eventId);
 
     if (!data)
       throw new NotFoundException('No se encontró el servicio de evento');
