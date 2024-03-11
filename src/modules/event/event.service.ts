@@ -33,44 +33,86 @@ export class EventService {
   }
 
   async getAllEvents() {
-    const { data: relationData, status: relationDataStatus } =
-      await this.supabaseClient.from('event').select('id, level, EventType');
-    const { data: eventData } = await this.supabaseClient
+    const { data, status } = await this.supabaseClient
       .from('event')
-      .select('title, start_time, end_time, location, location_text, price');
+      .select(
+        'id, level, EventType,title, start_time, end_time, location, location_text, price',
+      );
 
-    if (relationDataStatus !== 200 || !relationData || !eventData)
+    if (status !== 200 || !data)
       throw new NotFoundException('No se encontraron eventos');
 
-    const eventsWithData = await Promise.all(
-      relationData.map(async (event, index) => {
+    const eventsData = await Promise.all(
+      data.map(async (event) => {
+        const title = event.title;
+        const startTime = event.start_time;
+        const endTime = event.end_time;
+
+        function formatDate(dateString: string): string {
+          const days = [
+            'Domingo',
+            'Lunes',
+            'Martes',
+            'Miércoles',
+            'Jueves',
+            'Viernes',
+            'Sábado',
+          ];
+          const date = new Date(dateString);
+          const dayOfWeek = days[date.getDay()];
+          const formattedDate = date.toISOString().split('T')[0];
+          return `${dayOfWeek} | ${formattedDate}`;
+        }
+
+        function formatTime(timeString: string): string {
+          return (
+            timeString.split('T')[1].split(':')[0] +
+            ':' +
+            timeString.split('T')[1].split(':')[1]
+          );
+        }
+
+        const formattedDateTime: string =
+          formatDate(startTime) +
+          ' | ' +
+          formatTime(startTime) +
+          ' - ' +
+          formatTime(endTime);
+
+        const location = event.location;
+        const locationText = event.location_text;
+        const price = event.price;
         const levelId = event.level;
-        const Nivel = await this.levelService.getLevelNameById(levelId);
+        const level = await this.levelService.getLevelNameById(levelId);
 
         const eventTypeid = event.EventType;
-        const TipoDeEvento =
+        const eventType =
           await this.eventTypeService.getNameByEventTypeId(eventTypeid);
 
         const eventFeatureid = event.id;
-        const Servicios =
+        const services =
           await this.eventFeatureService.getEventFeatureById(eventFeatureid);
 
         const assistantsid = event.id;
-        const Assistants =
+        const assistantsIds =
           await this.assistantsService.getAssistantsById(assistantsid);
-        const Participantes =
-          await this.profileService.getUsernameByUserId(Assistants);
+        const assistants =
+          await this.profileService.getUsernameByUserId(assistantsIds);
 
         return {
-          ...eventData[index],
-          Nivel,
-          TipoDeEvento,
-          Servicios,
-          Participantes,
+          level,
+          title,
+          eventType,
+          formattedDateTime,
+          location,
+          locationText,
+          services,
+          price,
+          assistants,
         };
       }),
     );
 
-    return eventsWithData;
+    return eventsData;
   }
 }
