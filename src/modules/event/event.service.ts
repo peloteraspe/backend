@@ -44,9 +44,17 @@ export class EventService {
 
     const eventsData = await Promise.all(
       data.map(async (event) => {
-        const title = event.title;
-        const startTime = event.start_time;
-        const endTime = event.end_time;
+        const {
+          id,
+          title,
+          start_time: startTime,
+          end_time: endTime,
+          location,
+          location_text: locationText,
+          level: levelId,
+          price,
+          EventType: eventTypeid,
+        } = event;
 
         const formattedDateTime: string =
           this.formatDate(startTime) +
@@ -55,23 +63,15 @@ export class EventService {
           ' - ' +
           this.formatTime(endTime);
 
-        const location = event.location;
-        const locationText = event.location_text;
-        const price = event.price;
-        const levelId = event.level;
         const level = await this.levelService.getLevelNameById(levelId);
 
-        const eventTypeid = event.EventType;
         const eventType =
           await this.eventTypeService.getNameByEventTypeId(eventTypeid);
 
-        const eventFeatureid = event.id;
-        const services =
-          await this.eventFeatureService.getEventFeatureById(eventFeatureid);
+        const services = await this.eventFeatureService.getEventFeatureById(id);
 
-        const assistantsid = event.id;
         const assistantsIds =
-          await this.assistantsService.getAssistantsById(assistantsid);
+          await this.assistantsService.getAssistantsById(id);
         const assistants =
           await this.profileService.getUsernameByUserId(assistantsIds);
 
