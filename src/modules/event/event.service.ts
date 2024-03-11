@@ -46,14 +46,12 @@ export class EventService {
       data.map(async (event) => {
         const {
           id,
-          title,
           start_time: startTime,
           end_time: endTime,
-          location,
           location_text: locationText,
           level: levelId,
-          price,
           EventType: eventTypeid,
+          ...rest
         } = event;
 
         const formattedDateTime: string =
@@ -77,14 +75,12 @@ export class EventService {
 
         return {
           level,
-          title,
           eventType,
           formattedDateTime,
-          location,
           locationText,
           services,
-          price,
           assistants,
+          ...rest,
         };
       }),
     );
