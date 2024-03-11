@@ -48,36 +48,12 @@ export class EventService {
         const startTime = event.start_time;
         const endTime = event.end_time;
 
-        function formatDate(dateString: string): string {
-          const days = [
-            'Domingo',
-            'Lunes',
-            'Martes',
-            'Miércoles',
-            'Jueves',
-            'Viernes',
-            'Sábado',
-          ];
-          const date = new Date(dateString);
-          const dayOfWeek = days[date.getDay()];
-          const formattedDate = date.toISOString().split('T')[0];
-          return `${dayOfWeek} | ${formattedDate}`;
-        }
-
-        function formatTime(timeString: string): string {
-          return (
-            timeString.split('T')[1].split(':')[0] +
-            ':' +
-            timeString.split('T')[1].split(':')[1]
-          );
-        }
-
         const formattedDateTime: string =
-          formatDate(startTime) +
+          this.formatDate(startTime) +
           ' | ' +
-          formatTime(startTime) +
+          this.formatTime(startTime) +
           ' - ' +
-          formatTime(endTime);
+          this.formatTime(endTime);
 
         const location = event.location;
         const locationText = event.location_text;
@@ -114,5 +90,29 @@ export class EventService {
     );
 
     return eventsData;
+  }
+
+  private formatDate(dateString: string): string {
+    const days = [
+      'Domingo',
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+    ];
+    const date = new Date(dateString);
+    const dayOfWeek = days[date.getDay()];
+    const formattedDate = date.toISOString().split('T')[0];
+    return `${dayOfWeek} | ${formattedDate}`;
+  }
+
+  private formatTime(timeString: string): string {
+    return (
+      timeString.split('T')[1].split(':')[0] +
+      ':' +
+      timeString.split('T')[1].split(':')[1]
+    );
   }
 }
