@@ -1,10 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-import { AssistantsService } from '../assistants/assistants.service';
-import { EventFeaturesService } from '../eventFeatures/eventFeatures.service';
-import { EventTypeService } from '../eventType/eventType.service';
-import { LevelService } from '../level/level.service';
 import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
@@ -12,10 +8,6 @@ export class EventService {
   constructor(
     private readonly supabaseClient: SupabaseClient,
     private readonly profileService: ProfileService,
-    private readonly levelService: LevelService,
-    private readonly eventTypeService: EventTypeService,
-    private readonly eventFeatureService: EventFeaturesService,
-    private readonly assistantsService: AssistantsService,
   ) {}
   async getUsernameByEventId(eventId: number) {
     const { data, status } = await this.supabaseClient
@@ -33,62 +25,60 @@ export class EventService {
   }
 
   async getAllEvents() {
-    const { data, status } = await this.supabaseClient
+    const { data: eventData, status: statusEvent } = await this.supabaseClient
       .from('event')
       .select(
         'id,title, start_time, end_time, location, location_text, price, max_users, level ( name ), EventType (name), assistants (user)',
       );
 
-    if (status !== 200 || !data)
+    if (statusEvent !== 200 || !eventData)
       throw new NotFoundException('No se encontraron eventos');
 
-    const eventsData = await Promise.all(
-      data.map(async (event) => {
-        const {
-          id: eventId,
-          start_time: startTime,
-          end_time: endTime,
-          location_text: locationText,
-          level: level,
-          EventType: eventType,
-          assistants,
-          max_users,
-          ...rest
-        } = event;
-
-        const formattedDateTime: string = this.formattedDateTime(
-          startTime,
-          endTime,
+    const { data: featuresData, status: statusFeatures } =
+      await this.supabaseClient
+        .from('eventFeatures')
+        .select('features: feature (name)')
+        .eq(
+          'event',
+          eventData.map((event) => event.id),
         );
 
-        //const level = await this.levelService.getLevelNameById(levelId);
+    if (statusFeatures !== 200 || !featuresData)
+      throw new NotFoundException('No se encontraron servicios');
 
-        // const eventType =
-        // await this.eventTypeService.getNameByEventTypeId(eventTypeid);
+    const featureNames = featuresData?.map((item) => item.features);
 
-        const services =
-          await this.eventFeatureService.getEventFeatureByEventId(eventId);
+    const eventsData = eventData.map((event) => {
+      const {
+        start_time: startTime,
+        end_time: endTime,
+        location_text: locationText,
+        level: level,
+        EventType: eventType,
+        assistants,
+        max_users,
+        ...rest
+      } = event;
 
-        //const assistantsIds =
-        //await this.assistantsService.getAssistantsByEventId(eventId);
+      const formattedDateTime: string = this.formattedDateTime(
+        startTime,
+        endTime,
+      );
 
-        const placesLeft = max_users - assistants.length;
-
-        return {
-          level,
-          eventType,
-          formattedDateTime,
-          locationText,
-          services,
-          placesLeft,
-          ...rest,
-        };
-      }),
-    );
+      const placesLeft = max_users - assistants.length;
+      return {
+        level,
+        eventType,
+        formattedDateTime,
+        locationText,
+        featureNames,
+        placesLeft,
+        ...rest,
+      };
+    });
 
     return eventsData;
   }
-
   private formattedDateTime(startTime: string, endTime: string): string {
     const data =
       this.formatDate(startTime) +
@@ -96,10 +86,8 @@ export class EventService {
       this.formatTime(startTime) +
       ' - ' +
       this.formatTime(endTime);
-
     return data;
   }
-
   private formatDate(dateString: string): string {
     const days = [
       'Domingo',
@@ -115,7 +103,6 @@ export class EventService {
     const formattedDate = date.toISOString().split('T')[0];
     return `${dayOfWeek} | ${formattedDate}`;
   }
-
   private formatTime(timeString: string): string {
     return (
       timeString.split('T')[1].split(':')[0] +
