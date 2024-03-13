@@ -44,7 +44,7 @@ export class EventService {
         start_time: startTime,
         end_time: endTime,
         location_text: locationText,
-        level: level,
+        level,
         EventType: eventType,
         assistants,
         max_users,
