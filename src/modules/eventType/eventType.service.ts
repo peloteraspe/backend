@@ -2,17 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
-export class ProfileService {
+export class EventTypeService {
   constructor(private readonly supabaseClient: SupabaseClient) {}
-  async getUsernameByUserId(userId: string) {
+  async getNameByEventTypeId(eventTypeId: string) {
     const { data } = await this.supabaseClient
-      .from('profile')
-      .select('username')
-      .eq('user', userId)
+      .from('eventType')
+      .select('name')
+      .eq('id', eventTypeId)
       .single();
 
-    if (!data) throw new NotFoundException('No se encontró el user');
+    if (!data) throw new NotFoundException('No se encontró el tipo de evento');
 
-    return data;
+    return data?.name;
   }
 }

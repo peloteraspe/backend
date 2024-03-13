@@ -2,17 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
-export class ProfileService {
+export class LevelService {
   constructor(private readonly supabaseClient: SupabaseClient) {}
-  async getUsernameByUserId(userId: string) {
+  async getLevelNameById(levelId: string) {
     const { data } = await this.supabaseClient
-      .from('profile')
-      .select('username')
-      .eq('user', userId)
+      .from('level')
+      .select('name')
+      .eq('id', levelId)
       .single();
 
-    if (!data) throw new NotFoundException('No se encontró el user');
+    if (!data) throw new NotFoundException('No se encontró el nivel');
 
-    return data;
+    return data?.name;
   }
 }
