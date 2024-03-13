@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
+import { EventFeaturesService } from '../eventFeatures/eventFeatures.service';
 import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class EventService {
   constructor(
     private readonly supabaseClient: SupabaseClient,
     private readonly profileService: ProfileService,
+    private readonly eventFeaturesService: EventFeaturesService,
   ) {}
   async getUsernameByEventId(eventId: number) {
     const { data, status } = await this.supabaseClient
@@ -25,30 +27,19 @@ export class EventService {
   }
 
   async getAllEvents() {
-    const { data: eventData, status: statusEvent } = await this.supabaseClient
+    const { data, status } = await this.supabaseClient
       .from('event')
       .select(
         'id,title, start_time, end_time, location, location_text, price, max_users, level ( name ), EventType (name), assistants (user)',
       );
 
-    if (statusEvent !== 200 || !eventData)
+    if (status !== 200 || !data)
       throw new NotFoundException('No se encontraron eventos');
+    const eventIds = data.map((event) => event.id);
+    const featuresData =
+      await this.eventFeaturesService.getEventFeatures(eventIds);
 
-    const { data: featuresData, status: statusFeatures } =
-      await this.supabaseClient
-        .from('eventFeatures')
-        .select('features: feature (name)')
-        .eq(
-          'event',
-          eventData.map((event) => event.id),
-        );
-
-    if (statusFeatures !== 200 || !featuresData)
-      throw new NotFoundException('No se encontraron servicios');
-
-    const featureNames = featuresData?.map((item) => item.features);
-
-    const eventsData = eventData.map((event) => {
+    const eventsData = data.map((event) => {
       const {
         start_time: startTime,
         end_time: endTime,
@@ -71,7 +62,7 @@ export class EventService {
         eventType,
         formattedDateTime,
         locationText,
-        featureNames,
+        featuresData,
         placesLeft,
         ...rest,
       };
