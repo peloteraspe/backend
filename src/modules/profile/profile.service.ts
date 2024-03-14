@@ -12,7 +12,7 @@ import { UpdateProfile } from './dto/profile.dto';
 export class ProfileService {
   constructor(
     private readonly supabaseClient: SupabaseClient,
-    private readonly ProfilePositionService: ProfilePositionService,
+    private readonly profilePositionService: ProfilePositionService,
   ) {}
   async getUsernameByUserId(userId: string) {
     const { data } = await this.supabaseClient
@@ -71,8 +71,8 @@ export class ProfileService {
 
       if (player_position) {
         const uniquePositions = [...new Set(player_position)];
-        await this.ProfilePositionService.deleteProfilePositionById(id);
-        await this.ProfilePositionService.insertProfilePositionById(
+        await this.profilePositionService.deleteProfilePositionById(id);
+        await this.profilePositionService.insertProfilePositionById(
           id,
           uniquePositions,
         );
