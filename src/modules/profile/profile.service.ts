@@ -50,55 +50,51 @@ export class ProfileService {
 
   async updateProfileById(id: number, updateData: UpdateProfile) {
     try {
-      if (Object.keys(updateData).length === 0) {
-        throw new BadRequestException(
-          'Debes ingresar las propiedades a modificar',
-        );
-      }
-
-      const { error: profileUpdateError } = await this.supabaseClient
+      const { player_position, level_id, username } = updateData;
+      const { data: profile } = await this.supabaseClient
         .from('profile')
         .update({
-          username: updateData?.username,
-          level_id: updateData?.level_id,
+          username,
+          level_id,
         })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (profileUpdateError) {
+      if (!profile) {
+        throw new NotFoundException('No se encontró el perfil');
+      }
+
+      // TODO: Crear el modulo y servicio de profile_position
+      // TODO: Poner como metodo delete en un servicio de profile_position y llamarlo aqui
+      const { error: positionsDeleteError } = await this.supabaseClient
+        .from('profile_position')
+        .delete()
+        .eq('profile_id', id);
+
+      if (positionsDeleteError) {
         throw new BadRequestException(
-          'Error al actualizar el perfil:',
-          profileUpdateError.message,
+          'Error al actualizar las posiciones del perfil:',
+          positionsDeleteError.message,
         );
       }
 
-      if (updateData.player_position) {
-        const { error: positionsDeleteError } = await this.supabaseClient
-          .from('profile_position')
-          .delete()
-          .eq('profile_id', id);
+      // TODO: Poner como metodo insert en un servicio de profile_position y llamarlo aqui
+      const { error: positionsUpdateError } = await this.supabaseClient
+        .from('profile_position')
+        .insert(
+          player_position.map((position) => ({
+            profile_id: id,
+            position_id: position,
+          })),
+        );
 
-        if (positionsDeleteError) {
-          throw new BadRequestException(
-            'Error al actualizar las posiciones del perfil:',
-            positionsDeleteError.message,
-          );
-        }
-
-        await Promise.all(
-          updateData.player_position.map(async (positionId) => {
-            const { error: positionsUpdateError } = await this.supabaseClient
-              .from('profile_position')
-              .insert([{ profile_id: id, position_id: positionId }]);
-
-            if (positionsUpdateError) {
-              throw new BadRequestException(
-                'Error al actualizar las posiciones del perfil:',
-                positionsUpdateError.message,
-              );
-            }
-          }),
+      if (positionsUpdateError) {
+        throw new BadRequestException(
+          'Error al actualizar las posiciones del perfil:',
+          positionsUpdateError.message,
         );
       }
+
       return { message: 'Perfil actualizado exitosamente!' };
     } catch (error) {
       throw new BadRequestException(`Error al actualizar el perfil: ${error}`);
