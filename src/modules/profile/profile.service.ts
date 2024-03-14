@@ -5,10 +5,15 @@ import {
 } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ProfilePositionService } from '../profilePosition/profilePosition.service';
 import { UpdateProfile } from './dto/profile.dto';
 @Injectable()
 export class ProfileService {
-  constructor(private readonly supabaseClient: SupabaseClient) {}
+  constructor(
+    private readonly supabaseClient: SupabaseClient,
+    private readonly ProfilePositionService: ProfilePositionService,
+  ) {}
   async getUsernameByUserId(userId: string) {
     const { data } = await this.supabaseClient
       .from('profile')
@@ -64,40 +69,18 @@ export class ProfileService {
         throw new NotFoundException('No se encontró el perfil');
       }
 
-      // TODO: Crear el modulo y servicio de profile_position
-      // TODO: Poner como metodo delete en un servicio de profile_position y llamarlo aqui
-      const { error: positionsDeleteError } = await this.supabaseClient
-        .from('profile_position')
-        .delete()
-        .eq('profile_id', id);
-
-      if (positionsDeleteError) {
-        throw new BadRequestException(
-          'Error al actualizar las posiciones del perfil:',
-          positionsDeleteError.message,
-        );
-      }
-
-      // TODO: Poner como metodo insert en un servicio de profile_position y llamarlo aqui
-      const { error: positionsUpdateError } = await this.supabaseClient
-        .from('profile_position')
-        .insert(
-          player_position.map((position) => ({
-            profile_id: id,
-            position_id: position,
-          })),
-        );
-
-      if (positionsUpdateError) {
-        throw new BadRequestException(
-          'Error al actualizar las posiciones del perfil:',
-          positionsUpdateError.message,
+      if (player_position) {
+        const uniquePositions = [...new Set(player_position)];
+        await this.ProfilePositionService.deleteProfilePositionById(id);
+        await this.ProfilePositionService.insertProfilePositionById(
+          id,
+          uniquePositions,
         );
       }
 
       return { message: 'Perfil actualizado exitosamente!' };
     } catch (error) {
-      throw new BadRequestException(`Error al actualizar el perfil: ${error}`);
+      throw new BadRequestException((error as any).response);
     }
   }
 }
