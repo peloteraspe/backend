@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ProfilePositionService } from '../profilePosition/profilePosition.service';
 import { UpdateProfile } from './dto/profile.dto';
 @Injectable()
