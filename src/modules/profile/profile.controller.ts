@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   ValidationPipe,
 } from '@nestjs/common';
 import {
@@ -16,7 +17,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { UpdateProfile } from './dto/profile.dto';
+import { createProfileDTO, UpdateProfile } from './dto/profile.dto';
 import { ProfileService } from './profile.service';
 
 @ApiTags('profile')
@@ -76,5 +77,31 @@ export class ProfileController {
     updateData: UpdateProfile,
   ) {
     return this.profileService.updateProfileById(id, updateData);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Crear un perfil de jugadora' })
+  @ApiResponse({ status: 201, description: 'Perfil creado exitosamente' })
+  @ApiBadRequestResponse({ description: 'Error al crear la jugadora' })
+  @ApiBody({
+    type: UpdateProfile,
+    examples: {
+      example1: {
+        value: {
+          user: '34199723-911f-45cc-b578-cf970a172fd3',
+          username: 'nombreEjemplo',
+          level_id: 3,
+          player_position: [1, 3, 5],
+        },
+        description:
+          '*Todas las propiedades son requeridas. *El level_id debe ser entre 1 y 3. *player_position debe ser un array de id entre 1 y 5',
+      },
+    },
+  })
+  createProfile(
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    createProfile: createProfileDTO,
+  ) {
+    return this.profileService.createProfile(createProfile);
   }
 }

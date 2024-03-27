@@ -6,7 +6,7 @@ import {
 import { SupabaseClient } from '@supabase/supabase-js';
 
 import { ProfilePositionService } from '../profilePosition/profilePosition.service';
-import { UpdateProfile } from './dto/profile.dto';
+import { createProfileDTO, UpdateProfile } from './dto/profile.dto';
 @Injectable()
 export class ProfileService {
   constructor(
@@ -80,6 +80,48 @@ export class ProfileService {
       return { message: 'Perfil actualizado exitosamente!' };
     } catch (error) {
       throw new BadRequestException((error as any).response);
+    }
+  }
+
+  async deleteProfileById(id: number) {
+    const { error: profileDeleteError } = await this.supabaseClient
+      .from('profile')
+      .delete()
+      .eq('id', id);
+    if (profileDeleteError) {
+      throw new BadRequestException(
+        `Error al eliminar el perfil:${profileDeleteError.message}`,
+      );
+    }
+  }
+
+  async createProfile(createProfile: createProfileDTO) {
+    const { player_position, level_id, username, user } = createProfile;
+    const { data: player, error: errorCreatePlayer } = await this.supabaseClient
+      .from('profile')
+      .insert({
+        user,
+        username,
+        level_id,
+      })
+      .select();
+    try {
+      if (errorCreatePlayer) {
+        throw new BadRequestException(
+          `Error al crear la jugadora: ${errorCreatePlayer.message}`,
+        );
+      }
+      if (player) {
+        const uniquePositions = [...new Set(player_position)];
+        await this.profilePositionService.insertProfilePositionById(
+          player[0].id,
+          uniquePositions,
+        );
+        return { message: 'Perfil creado exitosamente!' };
+      }
+    } catch (error) {
+      if (player) await this.deleteProfileById(player[0].id);
+      throw new BadRequestException((error as any)?.response);
     }
   }
 }
