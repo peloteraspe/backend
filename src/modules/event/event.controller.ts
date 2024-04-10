@@ -8,7 +8,7 @@ import { EventService } from './event.service';
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
-  @Get(':eventId')
+  @Get('user/:eventId')
   @ApiOperation({ description: 'Devuelve el username del event Id' })
   @ApiParam({
     name: 'eventId',
@@ -29,7 +29,15 @@ export class EventController {
     return this.eventService.getUsernameByEventId(eventId);
   }
 
-  @Get()
+  @Get(':userId?')
+  @ApiOperation({ description: 'Devuelve el username del event Id' })
+  @ApiParam({
+    name: 'userId',
+    type: 'string',
+    required: true,
+    example: '1',
+    description: 'ID del evento',
+  })
   @ApiOperation({ description: 'Obtiene todos los eventos' })
   @ApiResponse({
     status: 200,
@@ -39,7 +47,11 @@ export class EventController {
     status: 404,
     description: 'No se encontraron eventos',
   })
-  getAllEvents() {
-    return this.eventService.getAllEvents();
+  getEvents(@Param('userId') userId?: string) {
+    if (userId) {
+      return this.eventService.getEventsByUserId(userId);
+    } else {
+      return this.eventService.getAllEvents();
+    }
   }
 }

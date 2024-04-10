@@ -101,4 +101,61 @@ export class EventService {
       timeString.split('T')[1].split(':')[1]
     );
   }
+
+  async getEventsByUserId(userId: string) {
+    const { data, status } = await this.supabaseClient
+      .from('event')
+      .select(
+        'id,title, start_time, end_time, location, location_text, price, level ( name ), EventType (name), assistants (state)',
+      )
+      .eq('created_by_id', userId);
+    if (status !== 200 || !data)
+      throw new NotFoundException('No se encontraron eventos');
+
+    const eventIds = data.map((event) => event.id);
+    const featuresData =
+      await this.eventFeaturesService.getEventFeatures(eventIds);
+
+    const eventsData = data.map((event) => {
+      const {
+        location_text: locationText,
+        level,
+        EventType: eventType,
+        ...rest
+      } = event;
+
+      const formattedDateTime: string = this.formattedDateTime(
+        event.start_time,
+        event.end_time,
+      );
+
+      return {
+        level,
+        eventType,
+        formattedDateTime,
+        locationText,
+        featuresData,
+        ...rest,
+      };
+    });
+    const currentDate = new Date();
+
+    const pastEvents = [];
+    const upcomingEvents = [];
+
+    for (const event of eventsData) {
+      const eventWithoutTimes = Object.assign({}, event);
+      delete eventWithoutTimes.end_time;
+      delete eventWithoutTimes.start_time;
+      const eventStartTime = new Date(event.start_time);
+
+      if (eventStartTime < currentDate) {
+        pastEvents.push(eventWithoutTimes);
+      } else {
+        upcomingEvents.push(eventWithoutTimes);
+      }
+    }
+
+    return { upcomingEvents, pastEvents };
+  }
 }
