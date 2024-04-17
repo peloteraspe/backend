@@ -13,10 +13,10 @@ export class ProfileService {
     private readonly supabaseClient: SupabaseClient,
     private readonly profilePositionService: ProfilePositionService,
   ) {}
-  async getUsernameByUserId(userId: string) {
+  async getByUserId(userId: string) {
     const { data } = await this.supabaseClient
       .from('profile')
-      .select('username')
+      .select()
       .eq('user', userId)
       .single();
 
@@ -24,7 +24,9 @@ export class ProfileService {
 
     return data;
   }
-  async getProfileById(id: number) {
+  async getProfileByUserId(userId: string) {
+    const { id } = await this.getByUserId(userId);
+
     const { data, error } = await this.supabaseClient
       .from('profile')
       .select(
@@ -52,8 +54,9 @@ export class ProfileService {
     return formatedData;
   }
 
-  async updateProfileById(id: number, updateData: UpdateProfile) {
+  async updateProfileById(userId: string, updateData: UpdateProfile) {
     try {
+      const { id } = await this.getByUserId(userId);
       const { player_position, level_id, username } = updateData;
       const { data: profile } = await this.supabaseClient
         .from('profile')
