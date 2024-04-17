@@ -109,6 +109,7 @@ export class EventService {
         'id,title, start_time, end_time, location, location_text, price, level ( name ), EventType (name), assistants (state)',
       )
       .eq('created_by_id', userId);
+
     if (status !== 200 || !data)
       throw new NotFoundException('No se encontraron eventos');
 
