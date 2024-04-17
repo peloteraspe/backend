@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   ValidationPipe,
@@ -25,14 +24,14 @@ import { ProfileService } from './profile.service';
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
-  @Get(':id')
+  @Get(':userId')
   @ApiOperation({ description: 'Devuelve el profile de la jugadora' })
   @ApiParam({
-    name: 'id',
-    type: 'number',
+    name: 'userId',
+    type: 'string',
     required: true,
-    example: 1,
-    description: 'ID del perfil',
+    example: '4596174f-4d72-4cf3-b99e-ddb38e2ff093',
+    description: 'ID del usuario',
   })
   @ApiResponse({
     status: 200,
@@ -42,18 +41,18 @@ export class ProfileController {
     status: 404,
     description: 'El perfil no fue encontrado',
   })
-  getProfileById(@Param('id', ParseIntPipe) id: number) {
-    return this.profileService.getProfileById(id);
+  getProfileById(@Param('userId') userId: string) {
+    return this.profileService.getProfileByUserId(userId);
   }
 
-  @Patch(':id')
+  @Patch(':userId')
   @ApiOperation({ description: 'Actualiza el profile de la jugadora' })
   @ApiParam({
-    name: 'id',
-    type: 'number',
+    name: 'userId',
+    type: 'string',
     required: true,
-    example: 24,
-    description: 'ID del perfil',
+    example: '4596174f-4d72-4cf3-b99e-ddb38e2ff093',
+    description: 'ID del usuario',
   })
   @ApiResponse({ status: 200, description: 'Perfil actualizado exitosamente!' })
   @ApiBadRequestResponse({ description: 'Error al actualizar el perfil' })
@@ -72,11 +71,11 @@ export class ProfileController {
     },
   })
   updateProfile(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('userId') userId: string,
     @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     updateData: UpdateProfile,
   ) {
-    return this.profileService.updateProfileById(id, updateData);
+    return this.profileService.updateProfileById(userId, updateData);
   }
 
   @Post()

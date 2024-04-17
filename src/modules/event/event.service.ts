@@ -21,7 +21,7 @@ export class EventService {
     if (status !== 200) throw new NotFoundException('Evento no encontrado');
     const userId = data?.created_by_id;
 
-    const username = await this.profileService.getUsernameByUserId(userId);
+    const { username } = await this.profileService.getByUserId(userId);
 
     return username;
   }
