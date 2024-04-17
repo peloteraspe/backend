@@ -29,14 +29,14 @@ export class EventController {
     return this.eventService.getUsernameByEventId(eventId);
   }
 
-  @Get(':userId?')
+  @Get(':userId')
   @ApiOperation({ description: 'Devuelve el username del event Id' })
   @ApiParam({
     name: 'userId',
     type: 'string',
     required: true,
-    example: '1',
-    description: 'ID del evento',
+    example: '4596174f-4d72-4cf3-b99e-ddb38e2ff093',
+    description: 'ID del usuario',
   })
   @ApiOperation({ description: 'Obtiene todos los eventos' })
   @ApiResponse({
@@ -47,11 +47,7 @@ export class EventController {
     status: 404,
     description: 'No se encontraron eventos',
   })
-  getEvents(@Param('userId') userId?: string) {
-    if (userId) {
-      return this.eventService.getEventsByUserId(userId);
-    } else {
-      return this.eventService.getAllEvents();
-    }
+  getEvents(@Param('userId') userId: string) {
+    return this.eventService.getEventsByUserId(userId);
   }
 }
