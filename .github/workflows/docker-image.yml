@@ -1,0 +1,30 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Docker login
+      env:
+        DOCKER_USER: ${{ secrects.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrects.DOCKER_PASSWORD }}
+      run: |
+        echo "Init login"
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        echo "Finish login"
+  
+    # - name: Build the Docker image
+    #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
