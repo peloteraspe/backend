@@ -28,10 +28,12 @@ jobs:
     - name: Build Docker image
       run: |
         docker build -t peloteras/backend:0.0.1 .
+        docker build -t peloteras/backend:latest .
 
     - name: Push Docker image
       run: |
         docker push peloteras/backend:0.0.1
+        docker push peloteras/backend:latest
   
     # - name: Build the Docker image
     #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
