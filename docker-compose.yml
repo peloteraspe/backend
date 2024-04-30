@@ -10,7 +10,7 @@ networks:
 services:  
   peloteras-back:
     container_name: peloteras-back
-    image: peloteras/backend
+    image: peloteras/backend:latest
     build:
       context: .
       dockerfile: Dockerfile

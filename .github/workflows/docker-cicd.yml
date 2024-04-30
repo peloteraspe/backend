@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker CICD
 
 on:
   push:
@@ -47,5 +47,19 @@ jobs:
         docker push peloteras/backend:$NEW_VERSION
         docker push peloteras/backend:latest
   
-    # - name: Build the Docker image
-    #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Connect to server and deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd peloteras/backend
+            docker-compose pull
+            docker-compose up -d
