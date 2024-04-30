@@ -61,5 +61,5 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd peloteras/backend
-            docker-compose pull
-            docker-compose up -d
+            docker compose pull
+            docker compose up -d
