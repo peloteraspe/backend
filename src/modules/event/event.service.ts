@@ -70,6 +70,28 @@ export class EventService {
 
     return eventsData;
   }
+
+  async getEventById(id: number) {
+    const { data, status } = await this.supabaseClient
+      .from('event')
+      .select('*, assistants(user)')
+      .eq('id', id)
+      .single();
+
+    if (status !== 200) throw new NotFoundException('Evento no encontrado');
+
+    const { assistants, ...rest } = data;
+
+    const username = await Promise.all(
+      assistants.map(async (userId: any) => {
+        const { username } = await this.profileService.getByUserId(userId.user);
+        return { username };
+      }),
+    );
+
+    return { event: rest, assistants: username };
+  }
+
   private formattedDateTime(startTime: string, endTime: string): string {
     const data =
       this.formatDate(startTime) +

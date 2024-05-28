@@ -43,7 +43,28 @@ export class EventController {
     return this.eventService.getAllEvents();
   }
 
-  @Get(':userId')
+  @Get(':id')
+  @ApiOperation({ description: 'Obtiene un event por id' })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
+    example: 1,
+    description: 'ID del evento',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Detalles del evento',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No se el evento',
+  })
+  getEventById(@Param('id', ParseIntPipe) id: number) {
+    return this.eventService.getEventById(id);
+  }
+
+  @Get('up-past/:userId')
   @ApiOperation({ description: 'Devuelve el username del event Id' })
   @ApiParam({
     name: 'userId',
